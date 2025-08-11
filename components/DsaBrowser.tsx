@@ -19,12 +19,10 @@ export default function DsaBrowser({ initialPath }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [fuzzy, setFuzzy] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState<number>(288); // default sidebar width
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const resizingRef = useRef(false);
-  // Single unified search input (also focused via Ctrl/Cmd+K)
   const searchInputRef = useRef<HTMLInputElement | null>(null);
-
-  // Removed localStorage persistence for expanded nodes, selected file, and sidebar width.
-  // Global key handler: focus search input (unified search) on Ctrl/Cmd+K
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -59,6 +57,22 @@ export default function DsaBrowser({ initialPath }: Props) {
       return changed ? next : prev; // keep same reference if nothing new to prevent re-renders
     });
   }, [selectedPath]);
+
+  // Track viewport width for responsive behavior
+  useEffect(() => {
+    const update = () => {
+      const w = typeof window !== "undefined" ? window.innerWidth : 1024;
+      setIsMobile(w < 768); // Tailwind md breakpoint
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  // Close mobile sidebar on file select
+  useEffect(() => {
+    if (isMobile) setMobileSidebarOpen(false);
+  }, [selectedPath, isMobile]);
 
   // Simple fuzzy score
   const score = useCallback((needle: string, hay: string) => {
@@ -101,10 +115,7 @@ export default function DsaBrowser({ initialPath }: Props) {
     return arr.slice(0, 500).map((x) => x.file);
   }, [data, search, fuzzy, score]);
 
-  const currentFile =
-    filteredFiles.find((f) => f.path === selectedPath) ||
-    (filteredFiles[0] ?? null);
-  // counts handled in Sidebar
+  const currentFile = filteredFiles.find((f) => f.path === selectedPath);
 
   const toggleFolder = (p: string) => {
     const ns = new Set(expanded);
@@ -116,7 +127,7 @@ export default function DsaBrowser({ initialPath }: Props) {
   const onSelectFile = (p: string) => {
     setSelectedPath(p);
     if (typeof window !== "undefined") {
-      const url = "/dsa/" + p.split("/").map(encodeURIComponent).join("/");
+      const url = "/code/" + p.split("/").map(encodeURIComponent).join("/");
       window.history.replaceState(null, "", url);
     }
   };
@@ -149,34 +160,78 @@ export default function DsaBrowser({ initialPath }: Props) {
 
   return (
     <div className="h-screen w-full flex bg-gradient-to-br from-neutral-900 via-neutral-950 to-neutral-900 text-neutral-100 select-none">
-      {data && (
-        <Sidebar
-          data={data}
-          search={search}
-          setSearch={setSearch}
-          fuzzy={fuzzy}
-          setFuzzy={setFuzzy}
-          expanded={expanded}
-          toggleFolder={toggleFolder}
-          currentFile={currentFile || null}
-          onSelectFile={onSelectFile}
-          highlight={highlight}
-          filteredFiles={filteredFiles}
-          searchInputRef={searchInputRef}
+      {/* Sidebar (desktop) */}
+      {!isMobile && data && (
+        <div
+          style={{ width: sidebarWidth, minWidth: sidebarWidth }}
+          className="h-full shrink-0 border-r border-neutral-800/60 bg-neutral-900/40 backdrop-blur-sm"
+        >
+          <Sidebar
+            data={data}
+            search={search}
+            setSearch={setSearch}
+            fuzzy={fuzzy}
+            setFuzzy={setFuzzy}
+            expanded={expanded}
+            toggleFolder={toggleFolder}
+            currentFile={currentFile || null}
+            onSelectFile={onSelectFile}
+            highlight={highlight}
+            filteredFiles={filteredFiles}
+            searchInputRef={searchInputRef}
+          />
+        </div>
+      )}
+      {/* Resizer (desktop only) */}
+      {!isMobile && (
+        <div
+          onMouseDown={(e) => {
+            e.preventDefault();
+            resizingRef.current = true;
+          }}
+          onDoubleClick={() => setSidebarWidth(288)}
+          className="w-1 cursor-col-resize bg-neutral-700/50 hover:bg-indigo-400/50 transition-colors"
+          style={{ userSelect: "none" }}
         />
       )}
-      <div
-        onMouseDown={(e) => {
-          e.preventDefault();
-          resizingRef.current = true;
-        }}
-        onDoubleClick={() => setSidebarWidth(288)}
-        className="w-1 cursor-col-resize bg-neutral-700/50 hover:bg-indigo-400/50 transition-colors"
-        style={{ userSelect: "none" }}
-      />
+      {/* Mobile sidebar overlay */}
+      {isMobile && (
+        <>
+          <div
+            className={`fixed inset-0 z-40 transition-opacity duration-200 bg-black/50 ${
+              mobileSidebarOpen
+                ? "opacity-100"
+                : "pointer-events-none opacity-0"
+            }`}
+            onClick={() => setMobileSidebarOpen(false)}
+          />
+          <div
+            className={`fixed top-0 left-0 bottom-0 z-50 w-[85%] max-w-[320px] border-r border-neutral-800/70 bg-neutral-900/95 backdrop-blur-xl transition-transform duration-300 ease-out ${
+              mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+          >
+            {data && (
+              <Sidebar
+                data={data}
+                search={search}
+                setSearch={setSearch}
+                fuzzy={fuzzy}
+                setFuzzy={setFuzzy}
+                expanded={expanded}
+                toggleFolder={toggleFolder}
+                currentFile={currentFile || null}
+                onSelectFile={onSelectFile}
+                highlight={highlight}
+                filteredFiles={filteredFiles}
+                searchInputRef={searchInputRef}
+              />
+            )}
+          </div>
+        </>
+      )}
       <div
         onMouseMove={(e) => {
-          if (resizingRef.current) {
+          if (!isMobile && resizingRef.current) {
             const next = Math.min(500, Math.max(200, e.clientX));
             setSidebarWidth(next);
           }
@@ -190,12 +245,34 @@ export default function DsaBrowser({ initialPath }: Props) {
         className="flex-1 flex flex-col overflow-hidden"
       >
         <main className="flex-1 flex flex-col overflow-hidden">
-          <Breadcrumbs
-            breadcrumbs={breadcrumbs}
-            onSelect={onSelectFile}
-            currentExt={currentFile?.name.split(".").pop()}
-            currentLength={currentFile?.path.length}
-          />
+          {/* Top bar for mobile */}
+          {isMobile && (
+            <div className="flex items-center gap-2 p-2 border-b border-neutral-800/60 bg-neutral-900/60 backdrop-blur">
+              <button
+                onClick={() => setMobileSidebarOpen((o) => !o)}
+                className="px-3 py-2 rounded-md bg-neutral-800/80 hover:bg-neutral-700 text-xs font-medium tracking-wide border border-neutral-700 active:scale-[.97] transition"
+                aria-label="Toggle navigation"
+              >
+                {mobileSidebarOpen ? "Close" : "Menu"}
+              </button>
+              <div className="flex-1 min-w-0">
+                <Breadcrumbs
+                  breadcrumbs={breadcrumbs}
+                  onSelect={onSelectFile}
+                  currentExt={currentFile?.name.split(".").pop()}
+                  currentLength={currentFile?.path.length}
+                />
+              </div>
+            </div>
+          )}
+          {!isMobile && (
+            <Breadcrumbs
+              breadcrumbs={breadcrumbs}
+              onSelect={onSelectFile}
+              currentExt={currentFile?.name.split(".").pop()}
+              currentLength={currentFile?.path.length}
+            />
+          )}
           <div className="flex-1 overflow-auto">
             {currentFile ? (
               <CodeView file={currentFile} search={search} />

@@ -54,17 +54,9 @@ pnpm-debug.log*
 *.swo
 *~
 
-# C++ build artifacts
-*.o
-*.obj
-*.out
-*.exe
-*.a
-*.so
-*.dylib
-
 # Coverage directories
 coverage/
 
 # Misc
 *.orig
+.vercel

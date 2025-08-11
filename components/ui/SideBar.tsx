@@ -37,7 +37,7 @@ export default function Sidebar({
   const totalCount = data.files.length;
   const filteredCount = filteredFiles.length;
   return (
-    <aside className="flex flex-col shrink-0 border-r border-neutral-800 bg-neutral-900/60 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/40">
+    <aside className="flex flex-col h-full min-h-0 shrink-0 border-r border-neutral-800 bg-neutral-900/60 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/40">
       <div className="px-3 pt-3 pb-2 border-b border-neutral-800">
         <div className="flex items-center gap-2 mb-2">
           <span className="font-semibold tracking-tight text-sm uppercase text-neutral-400">
@@ -64,7 +64,7 @@ export default function Sidebar({
           static
         </span>
       </div>
-      <nav className="flex-1 overflow-auto text-sm leading-5 py-2 custom-scroll">
+      <nav className="flex-1 min-h-0 overflow-auto overflow-x-hidden text-sm leading-5 py-2 custom-scroll">
         <Tree
           node={data.tree}
           expanded={expanded}

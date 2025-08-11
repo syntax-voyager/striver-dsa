@@ -1,6 +1,6 @@
 "use client";
+import { TreeNode } from '@/types';
 import React from 'react';
-import { TreeNode } from './types';
 
 export function hasDescendantMatch(node: TreeNode, set: Set<string>): boolean {
   if (node.type === 'file' && node.path) return set.has(node.path);
