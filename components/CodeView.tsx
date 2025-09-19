@@ -34,15 +34,11 @@ function guessLanguage(name: string): Language | undefined {
 
 export default function CodeView({ file, search }: Props) {
   const lang = guessLanguage(file.name) as Language;
-  // Hydration-safe defaults. Always match server markup first render.
-  const [wrap, setWrap] = useState<boolean>(false);
   const [fontSize, setFontSize] = useState<number>(14);
 
   // On mount, read persisted preferences (client only) and apply.
   useEffect(() => {
     try {
-      const storedWrap = localStorage.getItem("code-wrap");
-      if (storedWrap != null) setWrap(storedWrap === "1");
       const storedFont = localStorage.getItem("code-font");
       if (storedFont) {
         const parsed = parseInt(storedFont, 10);
@@ -55,12 +51,6 @@ export default function CodeView({ file, search }: Props) {
     }
   }, []);
 
-  // Persist changes after user adjustments.
-  useEffect(() => {
-    try {
-      localStorage.setItem("code-wrap", wrap ? "1" : "0");
-    } catch {}
-  }, [wrap]);
   useEffect(() => {
     try {
       localStorage.setItem("code-font", String(fontSize));
@@ -114,15 +104,6 @@ export default function CodeView({ file, search }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <label className="flex items-center gap-1 text-[11px] cursor-pointer select-none">
-            <input
-              type="checkbox"
-              className="accent-indigo-600"
-              checked={wrap}
-              onChange={(e) => setWrap(e.target.checked)}
-            />
-            <span>Wrap</span>
-          </label>
           <div className="flex items-center gap-1 text-[11px]">
             <span className="opacity-60">Font</span>
             <input
@@ -164,7 +145,7 @@ export default function CodeView({ file, search }: Props) {
             }: RenderProps) => (
               <pre
                 className={`${className} h-full ${
-                  wrap ? "whitespace-pre-wrap" : "whitespace-pre"
+                  "whitespace-pre"
                 } p-4 leading-relaxed`}
                 style={{ ...style, fontSize, background: "transparent" }}
               >

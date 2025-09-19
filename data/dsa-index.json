@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-08-11T10:04:29.894Z",
+  "generatedAt": "2025-09-10T06:19:46.040Z",
   "files": [
     {
       "path": "arrays/longestSubarray.cpp",
@@ -12,9 +12,19 @@
       "content": "#include <iostream>\n#include <vector>\nusing namespace std;\n\n// Maximum Subarray Sum - Kadane's Algorithm\nint maxSubArray(vector<int>& nums) {\n    int maxSum = nums[0];\n    int currentSum = nums[0];\n    \n    for (int i = 1; i < nums.size(); i++) {\n        currentSum = max(nums[i], currentSum + nums[i]);\n        maxSum = max(maxSum, currentSum);\n    }\n    \n    return maxSum;\n}\n\nint main() {\n    vector<int> nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};\n    \n    int result = maxSubArray(nums);\n    cout << \"Maximum subarray sum: \" << result << endl;\n    \n    return 0;\n}\n"
     },
     {
+      "path": "arrays/rotateMatrix.cpp",
+      "name": "rotateMatrix.cpp",
+      "content": "// LC 48\n\n#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nvector<vector<int>> bruteForce(vector<vector<int>> &matrix, int m, int n)\n{\n    vector<vector<int>> ans(m, vector<int>(n, 0));\n\n    for (int i = 0; i < m; i++)\n    {\n        for (int j = 0; j < n; j++)\n        {\n            int temp = matrix[i][j];\n            ans[j][n - 1 - i] = temp;\n        }\n    }\n    return ans;\n}\n\nvoid optimal(vector<vector<int>> &matrix, int m, int n)\n{\n    for (int i = 0; i < m; i++)\n    {\n        for (int j = i; j < n; j++)\n        {\n\n            swap(matrix[i][j], matrix[j][i]);\n        }\n    }\n\n    for (int i = 0; i < m; i++)\n    {\n        reverse(matrix[i].begin(), matrix[i].end());\n    }\n}\n\nint main()\n{\n    vector<vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};\n    int m = matrix.size();\n    int n = matrix[0].size();\n\n    // Before\n    for (int i = 0; i < m; i++)\n    {\n        for (int j = 0; j < n; j++)\n        {\n            cout << matrix[i][j] << \" \";\n        }\n        cout << endl;\n    }\n    cout << endl;\n\n    // vector<vector<int>> ans = bruteForce(matrix, m, n);\n\n    optimal(matrix, m, n);\n\n    // After\n    for (int i = 0; i < m; i++)\n    {\n        for (int j = 0; j < n; j++)\n        {\n            cout << matrix[i][j] << \" \";\n        }\n        cout << endl;\n    }\n    return 0;\n}"
+    },
+    {
       "path": "arrays/second.cpp",
       "name": "second.cpp",
       "content": "#include <iostream>\n#include <limits.h> // Required for INT_MIN and INT_MAX\n\nusing namespace std;\n\nint secondLargestFn(int arr[], int n)\n{\n    // Handle arrays with less than 2 elements\n    if (n < 2)\n    {\n        return -1; // Or handle as an error\n    }\n    int largest = INT_MIN;\n    int secondLargest = INT_MIN;\n    for (int i = 0; i < n; i++)\n    {\n        if (arr[i] > largest)\n        {\n            secondLargest = largest;\n            largest = arr[i];\n        }\n        // Check if current element is between largest and secondLargest\n        else if (arr[i] > secondLargest && arr[i] != largest)\n        {\n            secondLargest = arr[i];\n        }\n    }\n    return secondLargest;\n}\n\nint secondSmallestFn(int arr[], int n)\n{\n    // Handle arrays with less than 2 elements\n    if (n < 2)\n    {\n        return -1; // Or handle as an error\n    }\n    int smallest = INT_MAX;\n    int secondSmallest = INT_MAX;\n    for (int i = 0; i < n; i++)\n    {\n        if (arr[i] < smallest)\n        {\n            secondSmallest = smallest;\n            smallest = arr[i];\n        }\n        // Check if current element is between smallest and secondSmallest\n        else if (arr[i] < secondSmallest && arr[i] != smallest)\n        {\n            secondSmallest = arr[i];\n        }\n    }\n    return secondSmallest;\n}\n\nint main()\n{\n    int arr[] = {10, 5, 8, 20, 12};\n    int n = sizeof(arr) / sizeof(arr[0]);\n    int secondLargest = secondLargestFn(arr, n);   // Should be 12\n    int secondSmallest = secondSmallestFn(arr, n); // Should be 8\n    cout << \"Second Largest: \" << secondLargest << endl;\n    cout << \"Second Smallest: \" << secondSmallest << endl;\n    return 0;\n}"
+    },
+    {
+      "path": "arrays/spiralMatrix.cpp",
+      "name": "spiralMatrix.cpp",
+      "content": "// LC 54\n\n#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nvector<int> spiral(vector<vector<int>> &matrix, int m, int n)\n{\n    vector<int> ans;\n    int top = 0, right = n - 1, bottom = m - 1, left = 0;\n\n    while (top <= bottom && left <= right)\n    {\n        // top: left -> right\n        for (int i = left; i <= right; i++)\n        {\n            ans.push_back(matrix[top][i]);\n        }\n        top++;\n\n        // right: top -> bottom\n        for (int i = top; i <= bottom; i++)\n        {\n            ans.push_back(matrix[i][right]);\n        }\n        right--;\n\n        // bottom: right -> left\n        if (top <= bottom)\n        {\n\n            for (int i = right; i >= left; i--)\n            {\n                ans.push_back(matrix[bottom][i]);\n            }\n            bottom--;\n        }\n\n        // left: bottom -> top\n        if (left <= right)\n        {\n\n            for (int i = bottom; i >= top; i--)\n            {\n                ans.push_back(matrix[i][left]);\n            }\n            left++;\n        }\n    }\n    return ans;\n}\n\nint main()\n{\n    vector<vector<int>> matrix = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};\n    int m = matrix.size();\n    int n = matrix[0].size();\n\n    // Before\n    for (int i = 0; i < m; i++)\n    {\n        for (int j = 0; j < n; j++)\n        {\n            cout << matrix[i][j] << \" \";\n        }\n        cout << endl;\n    }\n    cout << endl;\n\n    vector<int> ans = spiral(matrix, m, n);\n\n    // After\n    for (int i = 0; i < ans.size(); i++)\n    {\n        cout << ans[i] << \" \";\n    }\n    cout << endl;\n    return 0;\n}"
     },
     {
       "path": "arrays/tempCodeRunnerFile.cpp",
@@ -32,6 +42,21 @@
       "content": "#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nvector<int> unionFn(int arr1[], int arr2[], int n, int m)\n{\n    vector<int> unionArr;\n    int i = 0, j = 0;\n\n    while (i < n && j < m)\n    {\n        if (arr1[i] <= arr2[j])\n        {\n            if (unionArr.size() == 0 || unionArr.back() != arr1[i])\n            {\n                unionArr.push_back(arr1[i]);\n            }\n            i++;\n        }\n        else\n        {\n            if (unionArr.size() == 0 || unionArr.back() != arr2[j])\n            {\n                unionArr.push_back(arr2[j]);\n            }\n            j++;\n        }\n    }\n\n    while (i < n)\n    {\n        if (unionArr.back() != arr1[i])\n        {\n            unionArr.push_back(arr1[i]);\n        }\n        i++;\n    }\n\n    while (j < m)\n    {\n        if (unionArr.back() != arr2[j])\n        {\n            unionArr.push_back(arr2[j]);\n        }\n        j++;\n    }\n\n    return unionArr;\n}\n\nint main()\n{\n    int n = 10, m = 7;\n    int arr1[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};\n    int arr2[] = {2, 3, 4, 4, 5, 11, 12};\n    vector<int> unionArr = unionFn(arr1, arr2, n, m);\n\n    for (auto &val : unionArr)\n    {\n        cout << val << \" \";\n    }\n    cout << endl;\n    return 0;\n}"
     },
     {
+      "path": "binarySearch/floorCeil.cpp",
+      "name": "floorCeil.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n    int arr[] = {3, 4, 4, 7, 8, 10};\n    int n = 6;\n    int x = 8;\n\n    int floor = -1, ceil = -1;\n\n    int start = 0, end = n - 1;\n\n    while (start <= end)\n    {\n        int mid = start + (end - start) / 2;\n\n        if (arr[mid] <= x)\n        {\n            floor = arr[mid];\n            start = mid + 1;\n        }\n        else\n        {\n            end = mid - 1;\n        }\n    }\n\n    start = 0, end = n - 1;\n\n    while (start <= end)\n    {\n        int mid = start + (end - start) / 2;\n\n        if (arr[mid] >= x)\n        {\n            ceil = arr[mid];\n            end = mid - 1;\n        }\n        else\n        {\n            start = mid + 1;\n        }\n    }\n\n    cout << floor << \" \" << ceil << endl;\n}"
+    },
+    {
+      "path": "binarySearch/occurance.cpp",
+      "name": "occurance.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n    int nums[] = {2, 2, 3, 3, 3, 3, 4};\n    int n = 7;\n    int x = 3;\n\n    int freq = -1;\n\n    int start = 0, end = n - 1;\n    while (start <= end)\n    {\n        int mid = start + (end - start);\n\n        if (nums[mid] == x)\n        {\n            freq++;\n            end = mid - 1;\n        }\n        else if (nums[mid] < x)\n        {\n            start = mid + 1;\n        }\n        else\n        {\n            end = mid - 1;\n        }\n    }\n\n    start = 0, end = n - 1;\n    while (start <= end)\n    {\n        int mid = start + (end - start);\n\n        if (nums[mid] == x)\n        {\n            freq++;\n            start = mid + 1;\n        }\n        else if (nums[mid] < x)\n        {\n            start = mid + 1;\n        }\n        else\n        {\n            end = mid - 1;\n        }\n    }\n    cout << freq << endl;\n    return 0;\n}"
+    },
+    {
+      "path": "binarySearch/upperBound.cpp",
+      "name": "upperBound.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n    int arr[] = {1, 2, 2, 3};\n    int n = 4;\n    int x = 2;\n    int ans = -1;\n\n    int start = 0, end = n - 1;\n\n    while (start <= end)\n    {\n        int mid = start + (end - start) / 2;\n\n        if (arr[mid] > x)\n        {\n            ans = mid;\n            end = mid - 1;\n        }\n        else\n        {\n            start = mid + 1;\n        }\n    }\n\n    cout << ans << endl;\n\n    return 0;\n}"
+    },
+    {
       "path": "hashing/mapHashing.cpp",
       "name": "mapHashing.cpp",
       "content": "#include <iostream>\n#include <unordered_map>\n\nusing namespace std;\n\nint main()\n{\n    int n;\n    cin >> n;\n    int arr[n];\n\n    for (int i = 0; i < n; i++)\n    {\n        cin >> arr[i];\n    }\n\n    unordered_map<int, int> mp;\n    for (int i = 0; i < n; i++)\n    {\n        mp[arr[i]]++;\n    }\n\n    for (auto it : mp)\n    {\n        cout << it.first << \" --> \" << it.second << endl;\n    }\n\n    return 0;\n}"
@@ -40,6 +65,41 @@
       "path": "maths/reverseNumber.cpp",
       "name": "reverseNumber.cpp",
       "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n    int s = 4230;\n    int answer = 0;\n    while (s > 0)\n    {\n        int n = s % 10;\n        s /= 10;\n        answer = (answer * 10) + n;\n    }\n    cout << answer << endl;\n    return 0;\n}"
+    },
+    {
+      "path": "oops/containerClass.cpp",
+      "name": "containerClass.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nclass Stack\n{\nprivate:\n    int *items;\n    int capacity;\n    int top;\n\npublic:\n    Stack(int size)\n    {\n        items = new int[size];\n        capacity = size;\n        top = -1;\n    }\n\n    ~Stack(){\n        delete[] items;\n    }\n\n    void push(int x)\n    {\n        if (top >= capacity - 1)\n        {\n            cout << \"Stack Overflow\" << endl;\n            return;\n        }\n        items[++top] = x;\n    }\n\n    int pop()\n    {\n        if (top < 0)\n        {\n            cout << \"Stack Underflow\" << endl;\n            return -1;\n        }\n        return items[top--];\n    }\n};\n\nint main()\n{\n    Stack s(5);\n\n    s.push(1);\n    s.push(2);\n    s.push(3);\n    s.push(4);\n    s.push(5);\n\n    cout << s.pop() << endl;\n\n    return 0;\n}"
+    },
+    {
+      "path": "oops/copyConstructor.cpp",
+      "name": "copyConstructor.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nclass Vector\n{\nprivate:\n    int *data;\n    int size;\n\npublic:\n    // Constructor\n    Vector(int s)\n    {\n        size = s;\n        data = new int[size];\n        for (int i = 0; i < size; i++)\n        {\n            data[i] = 0;\n        }\n    }\n\n    // Copy constructor\n    Vector(const Vector &source)\n    {\n        size = source.size;\n        data = new int[size];\n        for (int i = 0; i < size; i++)\n        {\n            data[i] = source.data[i];\n        }\n        cout << \"Copy constructor called\" << endl;\n    }\n\n    // Destructor\n    ~Vector()\n    {\n        delete[] data;\n    }\n\n    void setValue(int index, int value)\n    {\n        if (index >= 0 && index < size)\n        {\n            data[index] = value;\n        }\n    }\n\n    void display()\n    {\n        for (int i = 0; i < size; i++)\n        {\n            cout << data[i] << \" \";\n        }\n        cout << endl;\n    }\n};\n\nint main()\n{\n    Vector v1(3);\n    v1.setValue(0, 10);\n    v1.setValue(1, 20);\n    v1.setValue(2, 30);\n\n    Vector v2 = v1; // Copy constructor called\n\n    v1.display(); // Output: 10 20 30\n    v2.display(); // Output: 10 20 30\n\n    return 0;\n}"
+    },
+    {
+      "path": "oops/friendClass.cpp",
+      "name": "friendClass.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nclass A\n{\nprivate:\n    int privateData;\n\npublic:\n    A()\n    {\n        privateData = 10;\n    }\n\n    friend class B;\n};\n\nclass B\n{\npublic:\n    void getInto(A a)\n    {\n        cout << a.privateData << endl;\n    }\n};\n\nint main()\n{\n    A a;\n    B b;\n    b.getInto(a);\n    return 0;\n}"
+    },
+    {
+      "path": "oops/friendFunction.cpp",
+      "name": "friendFunction.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nclass Box\n{\nprivate:\n    double height, width;\n\npublic:\n    Box(double h, double w)\n    {\n        height = h;\n        width = w;\n    }\n\n    friend double area(Box b);\n};\n\ndouble area(Box b)\n{\n    return b.height * b.width;\n}\n\nint main()\n{\n    Box b(2, 5);\n\n    cout << \"Area: \" << area(b) << endl;\n    return 0;\n}"
+    },
+    {
+      "path": "oops/inheriantance.cpp",
+      "name": "inheriantance.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nclass Animal\n{\npublic:\n    void eat()\n    {\n        cout << \"Eating...\" << endl;\n    }\n};\n\n// Single Inheritance\nclass Dog : public Animal\n{\npublic:\n    void bark()\n    {\n        cout << \"Barking\" << endl;\n    }\n};\n\n// Multilevel Inheritance\nclass Bird : public Dog\n{\npublic:\n    void fly()\n    {\n        cout << \"Flying\" << endl;\n    }\n};\n\nint main()\n{\n    Bird tom;\n    return 0;\n}"
+    },
+    {
+      "path": "oops/operatorOverloading.cpp",
+      "name": "operatorOverloading.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nclass Complex\n{\nprivate:\n    double real, imag;\n\npublic:\n    Complex(double r = 0, double i = 0)\n    {\n        real = r;\n        imag = i;\n    }\n\n    // Overloading the + operator\n    Complex operator+(const Complex &obj)\n    {\n        Complex result;\n        result.real = real + obj.real;\n        result.imag = imag + obj.imag;\n        return result;\n    }\n\n    void display()\n    {\n        cout << real << \" + \" << imag << \"i\" << endl;\n    }\n};\n\nint main()\n{\n    Complex c1(3, 4), c2(5, 6), c3;\n    c3 = c1 + c2; // c1.operator+(c2)\n    c3.display(); // Output: 8 + 10i\n    return 0;\n}\n"
+    },
+    {
+      "path": "oops/poly.cpp",
+      "name": "poly.cpp",
+      "content": "#include <iostream>\n\nusing namespace std;\n\nclass Animal\n{\npublic:\n    virtual void makeSound()\n    {\n        cout << \"Animal makes a sound\" << endl;\n    }\n};\n\nclass Dog : public Animal\n{\npublic:\n    void makeSound() override\n    {\n        cout << \"Barking\" << endl;\n    }\n};\n\nclass Cat : public Animal\n{\npublic:\n    void makeSound() override\n    {\n        cout << \"Meow\" << endl;\n    }\n};\n\nint main()\n{\n    Animal *animals[3];\n    animals[0] = new Animal();\n    animals[1] = new Dog();\n    animals[2] = new Cat();\n\n    for (int i = 0; i < 3; i++)\n    {\n        animals[i]->makeSound();\n    }\n    return 0;\n}"
     },
     {
       "path": "patterns/patter13.cpp",
@@ -152,6 +212,11 @@
       "content": "#include <iostream>\n\nusing namespace std;\n\nvoid passByReference(int &a, int &b, int &c)\n{\n    a = b + c;\n    cout << a << endl;\n}\n\nvoid passByValue(int a, int b, int c)\n{\n    a = b + c;\n    cout << a << endl;\n}\n\nint main()\n{\n    int a = 2;\n    int b = 3;\n    int c = 5;\n\n    // passByReference(a, b, c);\n\n    passByValue(a, b, c);\n\n    cout << a << endl;\n\n    return 0;\n}"
     },
     {
+      "path": "searching/binearySearch.cpp",
+      "name": "binearySearch.cpp",
+      "content": "#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nvoid search(vector<int> &arr, int target, int start, int end)\n{\n    int mid = start + (end - start) / 2;\n\n    if (arr[mid] == target)\n    {\n        cout << mid << endl;\n    }\n    else if (arr[mid] > target)\n    {\n        search(arr, target, start, mid - 1);\n    }\n    else\n    {\n        search(arr, target, mid + 1, end);\n    }\n}\n\nint main()\n{\n    vector<int> arr = {1, 2, 3, 4, 5, 6};\n    int target = 5;\n    int n = arr.size();\n\n    search(arr, target, 0, n - 1);\n    return 0;\n}"
+    },
+    {
       "path": "sorting/bubbleSort.cpp",
       "name": "bubbleSort.cpp",
       "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n    int N = 6;\n    int arr[] = {13, 46, 24, 52, 20, 9};\n    for (int i = N - 1; i > 0; i--)\n    {\n        bool flag = false;\n        for (int j = 0; j < i; j++)\n        {\n            if (arr[j] > arr[j + 1])\n            {\n                swap(arr[j], arr[j + 1]);\n                flag = true;\n            }\n        }\n        if (!flag)\n        {\n            break;\n        }\n    }\n    for (int i = 0; i < N; i++)\n    {\n        cout << arr[i] << \" \";\n    }\n    cout << endl;\n    return 0;\n}"
@@ -159,7 +224,7 @@
     {
       "path": "sorting/insertionSort.cpp",
       "name": "insertionSort.cpp",
-      "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n    int n = 6;\n    int arr[] = {13, 46, 24, 52, 20, 9};\n\n    for (int i = 1; i <= n; i++)\n    {\n        int j = i;\n        while (j > 0 && arr[j - 1] > arr[j])\n        {\n            swap(arr[j - 1], arr[j]);\n            j--;\n        }\n    }\n\n    for (int i = 0; i < n; i++)\n    {\n        cout << arr[i] << \" \";\n    }\n    cout << endl;\n    return 0;\n}"
+      "content": "#include <iostream>\n\nusing namespace std;\n\nint main()\n{\n    int n = 6;\n    int arr[] = {13, 46, 24, 52, 20, 9};\n\n    for (int i = 1; i < n; i++)\n    {\n        int j = i;\n        while (j > 0 && arr[j - 1] > arr[j])\n        {\n            swap(arr[j - 1], arr[j]);\n            j--;\n        }\n    }\n\n    for (int i = 0; i < n; i++)\n    {\n        cout << arr[i] << \" \";\n    }\n    cout << endl;\n    return 0;\n}"
     },
     {
       "path": "sorting/mergeSort.cpp",
@@ -220,10 +285,20 @@
             "type": "file",
             "path": "arrays/maxSubarray.cpp"
           },
+          "rotateMatrix.cpp": {
+            "name": "rotateMatrix.cpp",
+            "type": "file",
+            "path": "arrays/rotateMatrix.cpp"
+          },
           "second.cpp": {
             "name": "second.cpp",
             "type": "file",
             "path": "arrays/second.cpp"
+          },
+          "spiralMatrix.cpp": {
+            "name": "spiralMatrix.cpp",
+            "type": "file",
+            "path": "arrays/spiralMatrix.cpp"
           },
           "tempCodeRunnerFile.cpp": {
             "name": "tempCodeRunnerFile.cpp",
@@ -239,6 +314,27 @@
             "name": "union.cpp",
             "type": "file",
             "path": "arrays/union.cpp"
+          }
+        }
+      },
+      "binarySearch": {
+        "name": "binarySearch",
+        "type": "folder",
+        "children": {
+          "floorCeil.cpp": {
+            "name": "floorCeil.cpp",
+            "type": "file",
+            "path": "binarySearch/floorCeil.cpp"
+          },
+          "occurance.cpp": {
+            "name": "occurance.cpp",
+            "type": "file",
+            "path": "binarySearch/occurance.cpp"
+          },
+          "upperBound.cpp": {
+            "name": "upperBound.cpp",
+            "type": "file",
+            "path": "binarySearch/upperBound.cpp"
           }
         }
       },
@@ -261,6 +357,47 @@
             "name": "reverseNumber.cpp",
             "type": "file",
             "path": "maths/reverseNumber.cpp"
+          }
+        }
+      },
+      "oops": {
+        "name": "oops",
+        "type": "folder",
+        "children": {
+          "containerClass.cpp": {
+            "name": "containerClass.cpp",
+            "type": "file",
+            "path": "oops/containerClass.cpp"
+          },
+          "copyConstructor.cpp": {
+            "name": "copyConstructor.cpp",
+            "type": "file",
+            "path": "oops/copyConstructor.cpp"
+          },
+          "friendClass.cpp": {
+            "name": "friendClass.cpp",
+            "type": "file",
+            "path": "oops/friendClass.cpp"
+          },
+          "friendFunction.cpp": {
+            "name": "friendFunction.cpp",
+            "type": "file",
+            "path": "oops/friendFunction.cpp"
+          },
+          "inheriantance.cpp": {
+            "name": "inheriantance.cpp",
+            "type": "file",
+            "path": "oops/inheriantance.cpp"
+          },
+          "operatorOverloading.cpp": {
+            "name": "operatorOverloading.cpp",
+            "type": "file",
+            "path": "oops/operatorOverloading.cpp"
+          },
+          "poly.cpp": {
+            "name": "poly.cpp",
+            "type": "file",
+            "path": "oops/poly.cpp"
           }
         }
       },
@@ -379,6 +516,17 @@
         "name": "referenceClass.cpp",
         "type": "file",
         "path": "referenceClass.cpp"
+      },
+      "searching": {
+        "name": "searching",
+        "type": "folder",
+        "children": {
+          "binearySearch.cpp": {
+            "name": "binearySearch.cpp",
+            "type": "file",
+            "path": "searching/binearySearch.cpp"
+          }
+        }
       },
       "sorting": {
         "name": "sorting",
